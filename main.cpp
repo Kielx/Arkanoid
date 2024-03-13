@@ -1,11 +1,13 @@
 #include <SFML/Graphics.hpp>
+#include "Ball.h"
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1024, 768), "Arkanoid!");
-    sf::CircleShape shape(300.f);
-    shape.setFillColor(sf::Color::Green);
-    shape.move(100, 100);
+    constexpr int windowWidth{ 800 }, windowHeight{ 600 };
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Arkanoid!");
+    window.setFramerateLimit(60);
+
+    Ball ball(windowWidth / 2, windowHeight / 2);
 
     while (window.isOpen())
     {
@@ -19,30 +21,12 @@ int main()
 				if (event.key.code == sf::Keyboard::Escape)
 					window.close();
 			}
-            if (event.type == sf::Event::KeyPressed)
-            {
-                if (event.key.code == sf::Keyboard::Left)
-                {
-					shape.move(-10, 0);
 
-				}
-                if (event.key.code == sf::Keyboard::Right)
-                {
-					shape.move(10, 0);
-				}
-                if (event.key.code == sf::Keyboard::Up)
-                {
-					shape.move(0, -10);
-				}
-                if (event.key.code == sf::Keyboard::Down)
-                {
-					shape.move(0, 10);
-				}
-			}
+			
         }
 
         window.clear();
-        window.draw(shape);
+        window.draw(ball.shape);
         window.display();
     }
 
