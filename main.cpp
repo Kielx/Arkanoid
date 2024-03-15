@@ -1,11 +1,14 @@
 #include <SFML/Graphics.hpp>
 #include "Ball.h"
+#include "Global.h" // for windowWidth and windowHeight
+
+int windowWidth{ 800 }, windowHeight{ 600 };
 
 int main()
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    constexpr int windowWidth{ 800 }, windowHeight{ 600 };
+
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Arkanoid!", sf::Style::Default, settings);
     window.setFramerateLimit(60);
 
@@ -29,6 +32,7 @@ int main()
 
         window.clear();
         window.draw(ball.shape);
+        ball.update();
         window.display();
     }
 

@@ -1,5 +1,8 @@
 #include "Ball.h"
+
 #include <SFML/Graphics.hpp>
+
+
 
 Ball::Ball(float startX, float startY)
 {
@@ -13,7 +16,9 @@ Ball::Ball(float startX, float startY)
 	shape.setRadius(10.f);
 	shape.setPosition(startX, startY);
 	shape.setTexture(&texture);
+
 	this->shape = shape;
+
 
 }
 
