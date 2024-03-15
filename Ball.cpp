@@ -3,10 +3,16 @@
 
 Ball::Ball(float startX, float startY)
 {
-	sf::CircleShape shape;
+
+	if (!texture.loadFromFile("./images/ball.png")) 
+	{
+		// error...
+	}
+	texture.setSmooth(true);
+
 	shape.setRadius(10.f);
-	shape.setFillColor(sf::Color::Red);
 	shape.setPosition(startX, startY);
+	shape.setTexture(&texture);
 	this->shape = shape;
 
 }

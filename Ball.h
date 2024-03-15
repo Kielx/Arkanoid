@@ -4,6 +4,7 @@ class Ball
 {
 	public:
 	sf::CircleShape shape;
+	sf::Texture texture;
 	Ball(float startX, float startY);
 	~Ball();
 };
