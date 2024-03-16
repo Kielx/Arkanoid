@@ -57,6 +57,14 @@ int main()
     Ball ball(windowWidth / 2, windowHeight / 2);
     Paddle paddle(windowWidth / 2, windowHeight - 50 );
 
+    sf::Music music;
+    if (!music.openFromFile("./sounds/backgroundMusic.ogg"))
+        return -1; // error
+    music.setPitch(0.75f);
+    music.setLoop(true);
+    music.setVolume(40.f);
+    music.play();
+
 
     while (window.isOpen())
     {
@@ -74,7 +82,7 @@ int main()
 			
         }
 
-        window.clear();
+        window.clear(sf::Color(30, 41, 59));
 
         ball.update();
         paddle.update();
