@@ -2,6 +2,7 @@
 #include "Ball.h"
 #include "Global.h" // for windowWidth and windowHeight
 #include "Paddle.h"
+#include "Brick.h"
 
 int windowWidth{ 800 }, windowHeight{ 600 };
 sf::SoundBuffer paddleHitBuffer;
@@ -65,6 +66,25 @@ int main()
     music.setVolume(40.f);
     music.play();
 
+    // We will use an `std::vector` to contain any number
+    // of `Brick` instances.
+    std::vector<Brick> bricks;
+
+    // Load brick texture only once
+    sf::Texture texture;
+    if (!texture.loadFromFile("./images/default_block.png"))
+    {
+        // print the error to console
+    }
+
+
+    // We fill up our vector via a 2D for loop, creating
+    // bricks in a grid-like pattern.
+    for (int iX{ 0 }; iX < Brick::countBlocksX; ++iX)
+        for (int iY{ 0 }; iY < Brick::countBlocksY; ++iY)
+            bricks.emplace_back(
+                (iX + 1) * (Brick::blockWidth + 3) + 22, (iY + 2) * (Brick::blockHeight + 3), texture);
+
 
     while (window.isOpen())
     {
@@ -92,6 +112,8 @@ int main()
 
         window.draw(ball.shape);
         window.draw(paddle.shape);
+
+        for (auto& brick : bricks) window.draw(brick.shape);
 
         window.display();
     }
