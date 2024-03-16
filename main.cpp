@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "Ball.h"
 #include "Global.h" // for windowWidth and windowHeight
+#include "Paddle.h"
 
 int windowWidth{ 800 }, windowHeight{ 600 };
 
@@ -13,6 +14,8 @@ int main()
     window.setFramerateLimit(60);
 
     Ball ball(windowWidth / 2, windowHeight / 2);
+    Paddle paddle(windowWidth / 2, windowHeight - 50 );
+
 
     while (window.isOpen())
     {
@@ -31,8 +34,13 @@ int main()
         }
 
         window.clear();
-        window.draw(ball.shape);
+
         ball.update();
+        paddle.update();
+
+        window.draw(ball.shape);
+        window.draw(paddle.shape);
+
         window.display();
     }
 

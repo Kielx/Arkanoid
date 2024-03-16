@@ -9,7 +9,7 @@
 Ball::Ball(float startX, float startY)
 {
 
-	if (!texture.loadFromFile("./images/ball.png")) 
+	if (!texture.loadFromFile("./images/ballBlue.png")) 
 	{
 		// error...
 	}

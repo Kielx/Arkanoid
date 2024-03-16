@@ -16,7 +16,7 @@ class Ball
 
 
 	// Let's create some constants for the Ball class.
-	const float ballRadius{ 10.f }, ballVelocity{ 8.f };
+	const float ballRadius{ 10.f }, ballVelocity{ 6.f };
 
 	// 2D vector that stores the Ball's velocity.
 	sf::Vector2f velocity{ -ballVelocity, -ballVelocity };
