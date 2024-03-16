@@ -7,6 +7,8 @@
 int windowWidth{ 800 }, windowHeight{ 600 };
 sf::SoundBuffer paddleHitBuffer;
 sf::Sound paddleHit;
+sf::SoundBuffer brickHitBuffer;
+sf::Sound brickHit;
 
 
 // Dealing with collisions: let's define a generic function
@@ -43,6 +45,54 @@ void testCollision(Paddle& mPaddle, Ball& mBall)
     paddleHit.setBuffer(paddleHitBuffer);
     paddleHit.setVolume(50);
     paddleHit.play();
+}
+
+// Here's the most complex part of our game: ball-brick collision.
+void testCollision(Brick& mBrick, Ball& mBall)
+{
+    // If there's no intersection, get out of the function.
+    if (!isIntersecting(mBrick, mBall)) return;
+
+    // Otherwise, the brick has been hit!
+    mBrick.destroyed = true;
+
+    // Let's calculate how much the ball intersects the brick
+    // in every direction.
+    float overlapLeft{ mBall.right() - mBrick.left() };
+    float overlapRight{ mBrick.right() - mBall.left() };
+    float overlapTop{ mBall.bottom() - mBrick.top() };
+    float overlapBottom{ mBrick.bottom() - mBall.top() };
+
+    // If the magnitude of the left overlap is smaller than the
+    // right one we can safely assume the ball hit the brick
+    // from the left.
+    bool ballFromLeft(abs(overlapLeft) < abs(overlapRight));
+
+    // We can apply the same idea for top/bottom collisions.
+    bool ballFromTop(abs(overlapTop) < abs(overlapBottom));
+
+    // Let's store the minimum overlaps for the X and Y axes.
+    float minOverlapX{ ballFromLeft ? overlapLeft : overlapRight };
+    float minOverlapY{ ballFromTop ? overlapTop : overlapBottom };
+
+    // If the magnitude of the X overlap is less than the magnitude
+    // of the Y overlap, we can safely assume the ball hit the brick
+    // horizontally - otherwise, the ball hit the brick vertically.
+
+    // Then, upon our assumptions, we change either the X or Y velocity
+    // of the ball, creating a "realistic" response for the collision.
+    if (abs(minOverlapX) < abs(minOverlapY))
+        mBall.velocity.x = ballFromLeft ? -mBall.ballVelocity : mBall.ballVelocity;
+    else
+        mBall.velocity.y = ballFromTop ? -mBall.ballVelocity : mBall.ballVelocity;
+
+    if (!brickHitBuffer.loadFromFile("./sounds/brickHit.ogg"))
+    {
+        // error...
+    }
+    brickHit.setBuffer(brickHitBuffer);
+    brickHit.setVolume(50);
+    brickHit.play();
 }
 
 
@@ -109,6 +159,19 @@ int main()
 
         // Let's test the collision every game loop iteration.
         testCollision(paddle, ball);
+
+        // We use another C++11 foreach loop to test collisions
+        // between the ball and EVERY brick.
+        for (auto& brick : bricks) testCollision(brick, ball);
+
+        // And we use the "erase-remove idiom" to remove all `destroyed`
+        // blocks from the block vector - using a cool C++11 lambda!
+        bricks.erase(remove_if(begin(bricks), end(bricks),
+            [](const Brick& mBrick)
+            {
+                return mBrick.destroyed;
+            }),
+            end(bricks));
 
         window.draw(ball.shape);
         window.draw(paddle.shape);
