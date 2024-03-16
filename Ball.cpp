@@ -15,6 +15,7 @@ Ball::Ball(float startX, float startY)
 	}
 	texture.setSmooth(true);
     shape.setRadius(10.f);
+    shape.setOrigin(shape.getRadius(), shape.getRadius());
     shape.setPosition(startX, startY);
     shape.setTexture(&texture);
 
