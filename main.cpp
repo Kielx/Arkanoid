@@ -4,6 +4,47 @@
 #include "Paddle.h"
 
 int windowWidth{ 800 }, windowHeight{ 600 };
+sf::SoundBuffer paddleHitBuffer;
+sf::Sound paddleHit;
+
+
+// Dealing with collisions: let's define a generic function
+// to check if two shapes are intersecting (colliding).
+template <class T1, class T2>
+bool isIntersecting(T1& mA, T2& mB)
+{
+    return mA.right() >= mB.left() && mA.left() <= mB.right() &&
+        mA.bottom() >= mB.top() && mA.top() <= mB.bottom();
+}
+
+// Let's define a function that deals with paddle/ball collision.
+void testCollision(Paddle& mPaddle, Ball& mBall)
+{
+    // If there's no intersection, get out of the function.
+    if (!isIntersecting(mPaddle, mBall)) return;
+
+
+
+    // Otherwise let's "push" the ball upwards.
+    mBall.velocity.y = -mBall.ballVelocity;
+
+    // And let's direct it dependently on the position where the
+    // paddle was hit.
+    if (mBall.x() < mPaddle.x())
+        mBall.velocity.x = -mBall.ballVelocity;
+    else
+        mBall.velocity.x = mBall.ballVelocity;
+
+    if (!paddleHitBuffer.loadFromFile("./sounds/paddleHit.flac"))
+    {
+        // error...
+    }
+    paddleHit.setBuffer(paddleHitBuffer);
+    paddleHit.setVolume(50);
+    paddleHit.play();
+}
+
+
 
 int main()
 {
@@ -37,6 +78,9 @@ int main()
 
         ball.update();
         paddle.update();
+
+        // Let's test the collision every game loop iteration.
+        testCollision(paddle, ball);
 
         window.draw(ball.shape);
         window.draw(paddle.shape);

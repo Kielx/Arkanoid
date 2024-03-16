@@ -11,8 +11,7 @@ class Ball
     sf::Sound wallHit;
     sf::SoundBuffer brickHitBuffer;
     sf::Sound brickHit;
-    sf::SoundBuffer paddleHitBuffer;
-    sf::Sound paddleHit;
+
 
 
 	// Let's create some constants for the Ball class.

@@ -33,11 +33,7 @@ Ball::Ball(float startX, float startY)
 	}
     brickHit.setBuffer(brickHitBuffer);
 
-    if (!paddleHitBuffer.loadFromFile("./sounds/paddleHit.flac"))
-    {
-		// error...
-	}
-	paddleHit.setBuffer(paddleHitBuffer);
+    
 
 
 
