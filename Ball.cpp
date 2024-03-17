@@ -3,9 +3,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
-
-
-
 Ball::Ball(float startX, float startY)
 {
 

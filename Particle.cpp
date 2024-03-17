@@ -9,24 +9,33 @@ public:
     sf::CircleShape shape;
     sf::Color color;
     bool right;
+    float gravity = 0.05f; // Adjust as needed
 
-    Particle(sf::Vector2f position, bool right) : position(position){
-		shape.setFillColor(sf::Color::White);
+
+    Particle(sf::Vector2f position, bool right, sf::Texture &texture) : position(position){
+        
         shape.setPosition(position);
-        shape.setRadius(5);
-        shape.setPointCount(3);
-        shape.setOrigin(50, 50);
+        shape.setRadius(13);
+        shape.setPointCount(4);
+        shape.setTexture(&texture);
         this->right = right;
+
+
+        // Set an initial upward velocity
+        velocity.y = -2.5f; // Adjust as needed
+        // Set a random horizontal velocity
+        velocity.x = (std::rand() % 20 - 10) / 40.0f; // Adjust as needed
     }
 
     void update(float dt) {
-        if (right) {
-			shape.move(5, 5);
-		}
-        else {
-			shape.move(-5, 5);
-		}
-
+        // Apply gravity to the vertical velocity
+        velocity.y += gravity * dt;
+        // Apply velocity to position
+        position += velocity * dt;
+        // Update the shape's position
+        shape.setPosition(position);
+        right ? shape.rotate(2) : shape.rotate(-2);
+        right ? shape.move(1, 0) : shape.move(-1, 0);
     }
    
 };
