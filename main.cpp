@@ -3,12 +3,17 @@
 #include "Global.h" // for windowWidth and windowHeight
 #include "Paddle.h"
 #include "Brick.h"
+#include "Particle.cpp"
+#include <iostream>
 
 int windowWidth{ 800 }, windowHeight{ 600 };
 sf::SoundBuffer paddleHitBuffer;
 sf::Sound paddleHit;
 sf::SoundBuffer brickHitBuffer;
 sf::Sound brickHit;
+
+// Bricks broken particle vector
+std::vector<Particle> particles;
 
 
 // Dealing with collisions: let's define a generic function
@@ -86,6 +91,10 @@ void testCollision(Brick& mBrick, Ball& mBall)
     else
         mBall.velocity.y = ballFromTop ? -mBall.ballVelocity : mBall.ballVelocity;
 
+    // Create particles
+        particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), true));
+		particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), false));
+
     if (!brickHitBuffer.loadFromFile("./sounds/brickHit.ogg"))
     {
         // error...
@@ -114,11 +123,14 @@ int main()
     music.setPitch(0.75f);
     music.setLoop(true);
     music.setVolume(40.f);
-    music.play();
+    //music.play();
 
     // We will use an `std::vector` to contain any number
     // of `Brick` instances.
     std::vector<Brick> bricks;
+
+
+
 
     // Load brick texture only once
     sf::Texture texture;
@@ -177,6 +189,18 @@ int main()
         window.draw(paddle.shape);
 
         for (auto& brick : bricks) window.draw(brick.shape);
+
+        // Update particles
+        for (Particle& p : particles) {
+            p.update(2);
+        }
+
+		// Draw particles
+        for (const Particle& p : particles) {
+			window.draw(p.shape);
+		}        
+
+        std::cout << particles.size() << std::endl;
 
         window.display();
     }
