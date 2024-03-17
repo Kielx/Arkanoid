@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include "Ball.h"
 #include "Global.h" // for windowWidth and windowHeight
 #include "Paddle.h"
@@ -11,6 +12,8 @@ sf::SoundBuffer paddleHitBuffer;
 sf::Sound paddleHit;
 sf::SoundBuffer brickHitBuffer;
 sf::Sound brickHit;
+int score = 0;
+sf::Text scoreText;
 
 
 // Bricks broken particle vector
@@ -62,6 +65,7 @@ void testCollision(Brick& mBrick, Ball& mBall)
 
     // Otherwise, the brick has been hit!
     mBrick.destroyed = true;
+    score += 100; // increase score
 
     // Let's calculate how much the ball intersects the brick
     // in every direction.
@@ -123,6 +127,16 @@ int main()
 
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Arkanoid!", sf::Style::Default, settings);
     window.setFramerateLimit(60);
+
+    sf::Font font;
+    if (!font.loadFromFile("./fonts/kenvector_future.ttf")) {
+        // handle error...
+    }
+    scoreText.setFont(font);
+    scoreText.setCharacterSize(18); // choose appropriate size
+    scoreText.setFillColor(sf::Color::White);
+    scoreText.setPosition(windowWidth - 170, 8); // adjust position as needed
+
 
     Ball ball(windowWidth / 2, windowHeight / 2);
     Paddle paddle(windowWidth / 2, windowHeight - 50 );
@@ -216,7 +230,9 @@ int main()
 			return p.shape.getPosition().y > windowHeight;
 			}), particles.end());
 
-        std::cout << particles.size() << std::endl;
+        // Update score
+        scoreText.setString("Score: " + std::to_string(score));
+		window.draw(scoreText);
 
         window.display();
     }
