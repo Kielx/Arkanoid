@@ -209,9 +209,14 @@ int main()
 		// Draw particles
         for (const Particle& p : particles) {
 			window.draw(p.shape);
-		}        
+		}
 
-        //std::cout << particles.size() << std::endl;
+        // Remove particles that are out of bounds
+        particles.erase(std::remove_if(particles.begin(), particles.end(), [](const Particle& p) {
+			return p.shape.getPosition().y > windowHeight;
+			}), particles.end());
+
+        std::cout << particles.size() << std::endl;
 
         window.display();
     }
