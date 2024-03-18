@@ -33,6 +33,7 @@ bool isIntersecting(T1& mA, T2& mB)
 // Let's define a function that deals with paddle/ball collision.
 void testCollision(Paddle& mPaddle, Ball& mBall)
 {
+    srand((unsigned)time(NULL));
     // If there's no intersection, get out of the function.
     if (!isIntersecting(mPaddle, mBall)) return;
 
@@ -43,10 +44,10 @@ void testCollision(Paddle& mPaddle, Ball& mBall)
 
     // And let's direct it dependently on the position where the
     // paddle was hit.
-    if (mBall.x() < mPaddle.x())
-        mBall.velocity.x = -mBall.ballVelocity;
+    if (mBall.x() < mPaddle.x()) 
+        mBall.velocity.x = -mBall.ballVelocity - (rand() % 2);
     else
-        mBall.velocity.x = mBall.ballVelocity;
+        mBall.velocity.x = mBall.ballVelocity + (rand() % 2);
 
     if (!paddleHitBuffer.loadFromFile("./sounds/paddleHit.flac"))
     {
