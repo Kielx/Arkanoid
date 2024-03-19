@@ -168,10 +168,12 @@ int main()
 
     // We fill up our vector via a 2D for loop, creating
     // bricks in a grid-like pattern.
+    /*
     for (int iX{ 0 }; iX < Brick::countBlocksX; ++iX)
         for (int iY{ 0 }; iY < Brick::countBlocksY; ++iY)
             bricks.emplace_back(
                 (iX + 1) * (Brick::blockWidth + 3) + 22, (iY + 2) * (Brick::blockHeight + 3), texture);
+    */
 
 
     while (window.isOpen())
@@ -191,6 +193,27 @@ int main()
         }
 
         window.clear(sf::Color(30, 41, 59));
+
+        if (bricks.empty()) {
+            // We fill vector with random number of bricks
+            int numberOfBricksX = rand() % 7 + 4;
+            int numberOfBricksY = rand() % 3 + 2;
+            int padLeft = 0;
+            if (numberOfBricksX < 11) {
+                 padLeft = (11 - numberOfBricksX) / 2;
+            }
+            for (int iX{ 0 }; iX < numberOfBricksX + padLeft; ++iX)
+                for (int iY{ 0 }; iY < numberOfBricksY; ++iY) {
+                    Brick newBrick = Brick((iX + 1) * (Brick::blockWidth + 3) + 22, (iY + 2) * (Brick::blockHeight + 3), texture);
+                    if (iX < padLeft) {
+						newBrick.destroyed = true;
+					}
+                    bricks.push_back(newBrick);
+                }
+                    
+
+		}
+
 
         ball.update();
         paddle.update();
