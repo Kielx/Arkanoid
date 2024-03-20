@@ -47,6 +47,19 @@ Ball::~Ball()
 
 void Ball::update()
 {
+    if (gameStopped) {
+        velocity.x = 0;
+        velocity.y = 0;
+        Ball::shape.setPosition(windowWidth / 2, windowHeight - 75);
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+			gameStopped = false;
+			velocity.x = -ballVelocity;
+			velocity.y = -ballVelocity;
+		}
+
+        return;
+    }
     shape.move(velocity);
 
     // We need to keep the ball "inside the screen".

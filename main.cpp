@@ -18,6 +18,8 @@ sf::Text scoreText;
 int level = 0;
 sf::Text levelText;
 int particlesSize = 0;
+sf::Text pressSpaceText;
+bool gameStopped = true;
 
 
 
@@ -150,6 +152,18 @@ int main()
     levelText.setFillColor(sf::Color::White);
     levelText.setPosition(8, 8); // adjust position as needed
 
+    // Show text press space to start
+
+    pressSpaceText.setFont(font);
+    pressSpaceText.setCharacterSize(24);
+    pressSpaceText.setFillColor(sf::Color::White);
+    pressSpaceText.setString("Press space to start");
+    pressSpaceText.setPosition(windowWidth / 2 - 165, windowHeight / 2);
+
+
+
+
+
 
     Ball ball(windowWidth / 2, windowHeight / 2);
     Paddle paddle(windowWidth / 2, windowHeight - 50 );
@@ -198,9 +212,22 @@ int main()
 
         window.clear(sf::Color(30, 41, 59));
 
+        if (gameStopped) {
+			window.draw(pressSpaceText);
+            // Show level text above the space to start text
+            levelText.setPosition(windowWidth / 2 - 20, windowHeight / 2 - 50);
+            
+        }
+        else {
+            levelText.setPosition(8, 8);
+        }
+
         // New level
         if (bricks.empty()) {
-            level++;
+            
+			level++;
+            gameStopped = true;
+            
             // We fill vector with random number of bricks
             int numberOfBricksX = rand() % 7 + 4;
             int numberOfBricksY = rand() % 3 + 2;
@@ -219,14 +246,19 @@ int main()
 						newBrick.destroyed = true;
 					}
                     bricks.push_back(newBrick);
-                }
-                    
+                }         
+            
 
-		}
+     }
 
-
+        // Update ball
         ball.update();
+
+        // Update paddle
         paddle.update();
+
+
+
 
         // Let's test the collision every game loop iteration.
         testCollision(paddle, ball);
@@ -272,6 +304,7 @@ int main()
         levelText.setString("Level: " + std::to_string(level));
         window.draw(levelText);
 
+        
         window.display();
     }
 
