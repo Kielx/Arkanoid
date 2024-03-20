@@ -17,6 +17,8 @@ int score = 0;
 sf::Text scoreText;
 int level = 0;
 sf::Text levelText;
+int particlesSize = 0;
+
 
 
 // Bricks broken particle vector
@@ -112,6 +114,8 @@ void testCollision(Brick& mBrick, Ball& mBall)
 	particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), false, particleTexture));
     particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), true, particleTexture));
     particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), false, particleTexture));
+    // Used to track how many particles are on the screen to make them fall higher each time for better effect
+    particlesSize = particles.size();
 
     if (!brickHitBuffer.loadFromFile("./sounds/brickHit.ogg"))
     {
@@ -259,6 +263,7 @@ int main()
         particles.erase(std::remove_if(particles.begin(), particles.end(), [](const Particle& p) {
 			return p.shape.getPosition().y > windowHeight;
 			}), particles.end());
+        particlesSize = particles.size();
 
         // Update score
         scoreText.setString("Score: " + std::to_string(score));

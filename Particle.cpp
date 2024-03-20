@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include "global.h"
 
 class Particle {
 public:
@@ -22,7 +23,7 @@ public:
 
 
         // Set an initial upward velocity
-        velocity.y = -2.5f; // Adjust as needed
+        velocity.y = -2.5f - float(particlesSize)/10; // Adjust as needed
         // Set a random horizontal velocity
         velocity.x = (std::rand() % 20 - 10) / 40.0f; // Adjust as needed
     }
