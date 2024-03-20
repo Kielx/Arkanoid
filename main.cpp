@@ -8,12 +8,15 @@
 #include <iostream>
 
 int windowWidth{ 800 }, windowHeight{ 600 };
+
 sf::SoundBuffer paddleHitBuffer;
 sf::Sound paddleHit;
 sf::SoundBuffer brickHitBuffer;
 sf::Sound brickHit;
 int score = 0;
 sf::Text scoreText;
+int level = 0;
+sf::Text levelText;
 
 
 // Bricks broken particle vector
@@ -138,6 +141,11 @@ int main()
     scoreText.setFillColor(sf::Color::White);
     scoreText.setPosition(windowWidth - 170, 8); // adjust position as needed
 
+    levelText.setFont(font);
+    levelText.setCharacterSize(18); // choose appropriate size
+    levelText.setFillColor(sf::Color::White);
+    levelText.setPosition(8, 8); // adjust position as needed
+
 
     Ball ball(windowWidth / 2, windowHeight / 2);
     Paddle paddle(windowWidth / 2, windowHeight - 50 );
@@ -166,14 +174,6 @@ int main()
     texture.setSmooth(true);
 
 
-    // We fill up our vector via a 2D for loop, creating
-    // bricks in a grid-like pattern.
-    /*
-    for (int iX{ 0 }; iX < Brick::countBlocksX; ++iX)
-        for (int iY{ 0 }; iY < Brick::countBlocksY; ++iY)
-            bricks.emplace_back(
-                (iX + 1) * (Brick::blockWidth + 3) + 22, (iY + 2) * (Brick::blockHeight + 3), texture);
-    */
 
 
     while (window.isOpen())
@@ -194,7 +194,9 @@ int main()
 
         window.clear(sf::Color(30, 41, 59));
 
+        // New level
         if (bricks.empty()) {
+            level++;
             // We fill vector with random number of bricks
             int numberOfBricksX = rand() % 7 + 4;
             int numberOfBricksY = rand() % 3 + 2;
@@ -261,6 +263,9 @@ int main()
         // Update score
         scoreText.setString("Score: " + std::to_string(score));
 		window.draw(scoreText);
+        // Update level
+        levelText.setString("Level: " + std::to_string(level));
+        window.draw(levelText);
 
         window.display();
     }
