@@ -208,6 +208,10 @@ int main()
                     if (iX < padLeft) {
 						newBrick.destroyed = true;
 					}
+                    // Randomly destroy some bricks
+                    if (rand() % 100 < 12) {
+						newBrick.destroyed = true;
+					}
                     bricks.push_back(newBrick);
                 }
                     
