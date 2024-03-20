@@ -72,7 +72,14 @@ void testCollision(Brick& mBrick, Ball& mBall)
     if (!isIntersecting(mBrick, mBall)) return;
 
     // Otherwise, the brick has been hit!
-    mBrick.destroyed = true;
+    if (mBrick.hp > 1) {
+		mBrick.updateHp(mBrick.hp - 1);
+	}
+    else if (mBrick.hp == 1) {
+        mBrick.hp = 0;
+        mBrick.destroyed = true;
+    }
+
     score += 100; // increase score
 
     // Let's calculate how much the ball intersects the brick
@@ -112,10 +119,10 @@ void testCollision(Brick& mBrick, Ball& mBall)
         // error...
     }
 
-    particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), true, particleTexture));
-	particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), false, particleTexture));
-    particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), true, particleTexture));
-    particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), false, particleTexture));
+    particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), true, particleTexture, mBrick.hp ));
+	particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), false, particleTexture, mBrick.hp));
+    particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), true, particleTexture, mBrick.hp));
+    particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), false, particleTexture, mBrick.hp));
     // Used to track how many particles are on the screen to make them fall higher each time for better effect
     particlesSize = particles.size();
 
@@ -237,13 +244,20 @@ int main()
             }
             for (int iX{ 0 }; iX < numberOfBricksX + padLeft; ++iX)
                 for (int iY{ 0 }; iY < numberOfBricksY; ++iY) {
-                    Brick newBrick = Brick((iX + 1) * (Brick::blockWidth + 3) + 22, (iY + 2) * (Brick::blockHeight + 3), texture);
+                    Brick newBrick = Brick((iX + 1) * (Brick::blockWidth + 3) + 22, (iY + 2) * (Brick::blockHeight + 3), texture, 1);
                     if (iX < padLeft) {
 						newBrick.destroyed = true;
 					}
-                    // Randomly destroy some bricks
-                    if (rand() % 100 < 12) {
+                    // Randomly destroy some bricks or set their hp to 2 or 3
+                    int random = rand() % 100;
+                    if (random < 12) {
 						newBrick.destroyed = true;
+					}
+                    if (random > 12 && random < 24) {
+                        newBrick.updateHp(2);
+                    }
+                    if (random > 24 && random < 36) {
+						newBrick.updateHp(3);
 					}
                     bricks.push_back(newBrick);
                 }         

@@ -13,13 +13,24 @@ public:
     float gravity = 0.05f; // Adjust as needed
 
 
-    Particle(sf::Vector2f position, bool right, sf::Texture &texture) : position(position){
+    Particle(sf::Vector2f position, bool right, sf::Texture &texture, int hp) : position(position){
         
         shape.setPosition(position);
         shape.setRadius(13);
         shape.setPointCount(4);
         shape.setTexture(&texture);
+
         this->right = right;
+
+        if (hp == 0) {
+            shape.setFillColor(sf::Color::Yellow);
+        }
+        else if (hp == 1) {
+            shape.setFillColor(sf::Color::Green);
+        }
+        else if (hp == 2) {
+            shape.setFillColor(sf::Color::Red);
+        }
 
 
         // Set an initial upward velocity
