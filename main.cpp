@@ -136,6 +136,24 @@ void testCollision(Brick& mBrick, Ball& mBall)
     brickHit.play();
 }
 
+void changeMusic(sf::Music& music1, sf::Music& music2, sf::Music& music3) {
+    if (music1.getStatus() == sf::Music::Playing) {
+		music1.stop();
+		music2.play();
+	}
+    else if (music2.getStatus() == sf::Music::Playing) {
+		music2.stop();
+		music3.play();
+	}
+    else if (music3.getStatus() == sf::Music::Playing) {
+		music3.stop();
+		music1.play();
+    }
+    else {
+        music1.play();	
+    }
+}
+
 
 
 int main()
@@ -176,13 +194,24 @@ int main()
     Ball ball(windowWidth / 2, windowHeight / 2);
     Paddle paddle(windowWidth / 2, windowHeight - 50 );
 
-    sf::Music music;
-    if (!music.openFromFile("./sounds/backgroundMusic.ogg"))
+    sf::Music music1;
+    if (!music1.openFromFile("./sounds/backgroundMusic1.ogg"))
         return -1; // error
-    music.setPitch(0.75f);
-    music.setLoop(true);
-    music.setVolume(40.f);
-    music.play();
+    music1.setLoop(true);
+    music1.setVolume(40.f);
+
+    sf::Music music2;
+    if (!music2.openFromFile("./sounds/backgroundMusic2.wav"))
+        return -1; // error
+    music2.setLoop(true);
+    music2.setVolume(40.f);
+
+    sf::Music music3;
+    if (!music3.openFromFile("./sounds/backgroundMusic3.ogg"))
+        return -1; // error
+    music3.setPitch(0.75f);
+    music3.setLoop(true);
+    music3.setVolume(40.f);
 
     // We will use an `std::vector` to contain any number
     // of `Brick` instances.
@@ -228,6 +257,7 @@ int main()
 			window.draw(pressSpaceText);    
             // Show level text above the space to start text
             levelText.setPosition(windowWidth / 2 - 20, windowHeight / 2 - 50);
+
             
         }
         else {
@@ -236,7 +266,7 @@ int main()
 
         // New level
         if (bricks.empty()) {
-            
+            changeMusic(music1, music2, music3);
 			level++;
             gameStopped = true;
             
