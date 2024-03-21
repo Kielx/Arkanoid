@@ -20,6 +20,7 @@ sf::Text levelText;
 int particlesSize = 0;
 sf::Text pressSpaceText;
 bool gameStopped = true;
+sf::Clock blinkClock;
 
 
 
@@ -220,7 +221,11 @@ int main()
         window.clear(sf::Color(30, 41, 59));
 
         if (gameStopped) {
-			window.draw(pressSpaceText);
+            float time = blinkClock.getElapsedTime().asSeconds();
+            int alpha = 127.5f * (1 + sin(2 * 3.14159f * time / 2)); // 2 seconds period
+            pressSpaceText.setFillColor(sf::Color(255, 255, 255, alpha));
+
+			window.draw(pressSpaceText);    
             // Show level text above the space to start text
             levelText.setPosition(windowWidth / 2 - 20, windowHeight / 2 - 50);
             
