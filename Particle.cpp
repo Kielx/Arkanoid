@@ -23,12 +23,15 @@ public:
         this->right = right;
 
         if (hp == 0) {
-            shape.setFillColor(sf::Color::Yellow);
+            shape.setFillColor(sf::Color::White);
         }
         else if (hp == 1) {
-            shape.setFillColor(sf::Color::Green);
+            shape.setFillColor(sf::Color::Color(96, 165, 250));
         }
         else if (hp == 2) {
+            shape.setFillColor(sf::Color::Yellow);
+        }
+        else if (hp == 3) {
             shape.setFillColor(sf::Color::Red);
         }
 

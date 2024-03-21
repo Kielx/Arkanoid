@@ -253,12 +253,15 @@ int main()
                     if (random < 12) {
 						newBrick.destroyed = true;
 					}
-                    if (random > 12 && random < 24) {
+                    if (random > 12 && random < 30) {
                         newBrick.updateHp(2);
                     }
-                    if (random > 24 && random < 36) {
+                    if (random > 30 && random < 42) {
 						newBrick.updateHp(3);
 					}
+                    if (random > 42 && random < 48) {
+                        newBrick.updateHp(4);
+                    }
                     bricks.push_back(newBrick);
                 }         
             
