@@ -61,6 +61,7 @@ void Ball::update()
         return;
     }
     shape.move(velocity);
+    shape.rotate(5.f);
 
     // We need to keep the ball "inside the screen".
 

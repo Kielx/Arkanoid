@@ -167,8 +167,14 @@ int main()
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
 
-    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Arkanoid!", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Super Arkanoid!", sf::Style::Titlebar | sf::Style::Close, settings);
     window.setFramerateLimit(60);
+    auto icon = sf::Image();
+    if (!icon.loadFromFile("./images/ballBlue.png")) {
+		// error...
+	}
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
 
     sf::Font font;
     if (!font.loadFromFile("./fonts/kenvector_future.ttf")) {
@@ -233,6 +239,7 @@ int main()
     }
     texture.setSmooth(true);
 
+
     // Load life indicator texture
     sf::Texture lifeIndicatorTexture;
     lifeIndicatorTexture.setSmooth(true);
@@ -245,7 +252,6 @@ int main()
     for (int i = 0; i < numberOfLives; ++i) {
         lifeIndicators.push_back(LifeIndicator(50 + i * 60, windowHeight - 10, lifeIndicatorTexture));
     }
-
 
     while (window.isOpen())
     {
