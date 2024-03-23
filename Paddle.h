@@ -17,6 +17,7 @@ class Paddle
     Paddle(float mX, float mY);    
 
     void update();
+    void reset();
 
     float x() { return shape.getPosition().x; }
     float y() { return shape.getPosition().y; }

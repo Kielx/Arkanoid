@@ -24,6 +24,7 @@ class Ball
     ~Ball();
 
     void update();
+    void reset();
 
     // We can also create "property" methods to easily
     // get commonly used values.

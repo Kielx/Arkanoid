@@ -37,3 +37,9 @@ void Paddle::update()
 	else
 		velocity.x = 0;
 }
+
+void Paddle::reset()
+{
+	shape.setPosition(windowWidth / 2, windowHeight - 50);
+	velocity.x = 0;
+}

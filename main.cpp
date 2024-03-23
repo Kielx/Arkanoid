@@ -4,6 +4,7 @@
 #include "Global.h" // for windowWidth and windowHeight
 #include "Paddle.h"
 #include "Brick.h"
+#include "LifeIndicator.h"
 #include "Particle.cpp"
 #include <iostream>
 
@@ -21,6 +22,12 @@ int particlesSize = 0;
 sf::Text pressSpaceText;
 bool gameStopped = true;
 sf::Clock blinkClock;
+
+int numberOfLives = 3;
+std::vector<LifeIndicator> lifeIndicators;
+
+
+
 
 
 
@@ -155,7 +162,6 @@ void changeMusic(sf::Music& music1, sf::Music& music2, sf::Music& music3) {
 }
 
 
-
 int main()
 {
     sf::ContextSettings settings;
@@ -186,8 +192,7 @@ int main()
     pressSpaceText.setString("Press space to start");
     pressSpaceText.setPosition(windowWidth / 2 - 165, windowHeight / 2);
 
-
-
+ 
 
 
 
@@ -209,7 +214,7 @@ int main()
     sf::Music music3;
     if (!music3.openFromFile("./sounds/backgroundMusic3.ogg"))
         return -1; // error
-    music3.setPitch(0.75f);
+    music3.setPitch(0.90f);
     music3.setLoop(true);
     music3.setVolume(40.f);
 
@@ -228,7 +233,18 @@ int main()
     }
     texture.setSmooth(true);
 
+    // Load life indicator texture
+    sf::Texture lifeIndicatorTexture;
+    lifeIndicatorTexture.setSmooth(true);
 
+    if (!lifeIndicatorTexture.loadFromFile("./images/paddleRed.png"))
+    {
+        // error...
+    }
+
+    for (int i = 0; i < numberOfLives; ++i) {
+        lifeIndicators.push_back(LifeIndicator(50 + i * 60, windowHeight - 10, lifeIndicatorTexture));
+    }
 
 
     while (window.isOpen())
@@ -266,7 +282,8 @@ int main()
 
         // New level
         if (bricks.empty()) {
-            changeMusic(music1, music2, music3);
+            srand((unsigned)time(NULL));
+            changeMusic(music3, music1, music2);
 			level++;
             gameStopped = true;
             
@@ -308,6 +325,36 @@ int main()
 
         // Update paddle
         paddle.update();
+
+        // Test if ball has gone out of bounds
+
+        if (ball.y() > windowHeight) {
+			ball.reset();
+			paddle.reset();
+			numberOfLives--;
+			lifeIndicators.pop_back();
+            gameStopped = true;
+            if (numberOfLives == 0) {
+				// Game over
+				// Show game over text
+                sf::Text gameOverText;
+                gameOverText.setFont(font);
+                gameOverText.setCharacterSize(36);
+                gameOverText.setFillColor(sf::Color::White);
+                gameOverText.setString("Game Over");
+                gameOverText.setPosition(windowWidth / 2 - 100, windowHeight / 2 - 50);
+                levelText.setPosition(windowWidth / 2 - 20, windowHeight / 2);
+                window.draw(levelText);
+                scoreText.setPosition(windowWidth / 2 - 50, windowHeight / 2 + 30);
+                
+                window.draw(scoreText);
+                window.draw(gameOverText);
+                window.display();
+                sf::sleep(sf::seconds(4));
+                window.close();
+			}
+		}
+
 
 
 
@@ -356,6 +403,10 @@ int main()
         levelText.setString("Level: " + std::to_string(level));
         window.draw(levelText);
 
+        // Draw life indicators
+        for (LifeIndicator& lifeIndicator : lifeIndicators) {
+			window.draw(lifeIndicator.lifeIndicatorShape);
+		}
         
         window.display();
     }

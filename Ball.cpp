@@ -83,6 +83,12 @@ void Ball::update()
     // The same idea can be applied for top/bottom collisions.
     if (top() < 0)
         velocity.y = ballVelocity;
-    else if (bottom() > windowHeight)
-        velocity.y = -ballVelocity;
+
+}
+
+void Ball::reset()
+{
+	shape.setPosition(windowWidth / 2, windowHeight - 75);
+	velocity.x = -ballVelocity;
+	velocity.y = -ballVelocity;
 }
