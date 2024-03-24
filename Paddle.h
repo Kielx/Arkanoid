@@ -4,9 +4,9 @@
 class Paddle
 {
 	// Let's create some constants for the paddle.
-	const float paddleWidth{ 80.f }, paddleHeight{ 20.f }, paddleVelocity{ 7.f };
 
     public:
+    const float paddleWidth{ 80.f }, paddleHeight{ 20.f }, paddleVelocity{ 7.f };
 	sf::RectangleShape shape;
     sf::Texture texture;
 	sf::Vector2f velocity;

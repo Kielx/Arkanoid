@@ -6,6 +6,7 @@
 #include "Brick.h"
 #include "LifeIndicator.h"
 #include "Particle.cpp"
+#include "Powerup.h"
 #include <iostream>
 
 int windowWidth{ 800 }, windowHeight{ 600 };
@@ -34,6 +35,8 @@ std::vector<LifeIndicator> lifeIndicators;
 // Bricks broken particle vector
 std::vector<Particle> particles;
 sf::Texture particleTexture;
+
+
 
 
 // Dealing with collisions: let's define a generic function
@@ -71,6 +74,25 @@ void testCollision(Paddle& mPaddle, Ball& mBall)
     paddleHit.setBuffer(paddleHitBuffer);
     paddleHit.setVolume(50);
     paddleHit.play();
+}
+
+// Test collision for powerups
+void testCollision(Powerup& mPowerUp, Paddle& mPaddle) {
+    	if (!isIntersecting(mPowerUp, mPaddle)) return;
+	// Powerup collected
+	mPowerUp.sprite.setPosition(-100, -100);
+	mPowerUp.velocity = { 0.f, 0.f };
+	// Increase paddle size
+    if (mPowerUp.powerupType == 0) {
+        mPaddle.shape.setSize({ mPaddle.paddleWidth * 1.5f, mPaddle.paddleHeight });
+        mPaddle.shape.setOrigin(mPaddle.paddleWidth * 1.5f / 2.f, mPaddle.paddleHeight / 2.f);
+    }
+    // Decrease paddle size
+    if (mPowerUp.powerupType == 1) {
+		mPaddle.shape.setSize({ mPaddle.paddleWidth / 1.5f, mPaddle.paddleHeight });
+		mPaddle.shape.setOrigin(mPaddle.paddleWidth / 1.5f / 2.f, mPaddle.paddleHeight / 2.f);
+	}
+
 }
 
 // Here's the most complex part of our game: ball-brick collision.
@@ -164,6 +186,7 @@ void changeMusic(sf::Music& music1, sf::Music& music2, sf::Music& music3) {
 
 int main()
 {
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
 
@@ -238,6 +261,15 @@ int main()
         // print the error to console
     }
     texture.setSmooth(true);
+
+    // Load powerup texture
+    sf::Texture powerupTexture;
+    if (!powerupTexture.loadFromFile("./images/crystals/crystal-qubodup-ccby3-32-blue.png"))
+    {
+        // error...
+    }
+    Powerup powerup(100, 100, 0, powerupTexture);
+    Powerup powerupDown(200, 200, 1, powerupTexture);
 
 
     // Load life indicator texture
@@ -368,6 +400,10 @@ int main()
         // Let's test the collision every game loop iteration.
         testCollision(paddle, ball);
 
+        // Test collision for powerup
+        testCollision(powerup, paddle);
+        testCollision(powerupDown, paddle);
+
         // We use another C++11 foreach loop to test collisions
         // between the ball and EVERY brick.
         for (auto& brick : bricks) testCollision(brick, ball);
@@ -413,6 +449,12 @@ int main()
         for (LifeIndicator& lifeIndicator : lifeIndicators) {
 			window.draw(lifeIndicator.lifeIndicatorShape);
 		}
+
+
+        powerup.update();
+        window.draw(powerup.sprite);
+        powerupDown.update();
+        window.draw(powerupDown.sprite);
         
         window.display();
     }
