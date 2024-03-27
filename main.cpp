@@ -32,9 +32,12 @@ std::vector<LifeIndicator> lifeIndicators;
 
 
 
+
+
 // Bricks broken particle vector
 std::vector<Particle> particles;
 sf::Texture particleTexture;
+std::vector<Powerup> powerups;
 
 
 
@@ -80,8 +83,14 @@ void testCollision(Paddle& mPaddle, Ball& mBall)
 void testCollision(Powerup& mPowerUp, Paddle& mPaddle) {
     	if (!isIntersecting(mPowerUp, mPaddle)) return;
 	// Powerup collected
-	mPowerUp.sprite.setPosition(-100, -100);
-	mPowerUp.velocity = { 0.f, 0.f };
+	mPowerUp.destroyed = true;
+    if (!paddleHitBuffer.loadFromFile("./sounds/powerup.flac"))
+    {
+		// error...
+	}
+	paddleHit.setBuffer(paddleHitBuffer);
+	paddleHit.setVolume(50);
+	paddleHit.play();
 	// Increase paddle size
     if (mPowerUp.powerupType == 0) {
         mPaddle.shape.setSize({ mPaddle.paddleWidth * 1.5f, mPaddle.paddleHeight });
@@ -96,7 +105,7 @@ void testCollision(Powerup& mPowerUp, Paddle& mPaddle) {
 }
 
 // Here's the most complex part of our game: ball-brick collision.
-void testCollision(Brick& mBrick, Ball& mBall)
+void testCollision(Brick& mBrick, Ball& mBall, std::map<int, sf::Texture>& powerupTextures)
 {
     // If there's no intersection, get out of the function.
     if (!isIntersecting(mBrick, mBall)) return;
@@ -163,6 +172,16 @@ void testCollision(Brick& mBrick, Ball& mBall)
     brickHit.setBuffer(brickHitBuffer);
     brickHit.setVolume(50);
     brickHit.play();
+
+    
+    if (rand() % 100 < 10) {
+        // Load powerup texture1
+
+        
+        // Randomly choose powerup type
+        int powerupType = rand() % 2;
+		powerups.push_back(Powerup(mBrick.x(), mBrick.y(), powerupType, powerupTextures[powerupType]));
+	}
 }
 
 void changeMusic(sf::Music& music1, sf::Music& music2, sf::Music& music3) {
@@ -221,6 +240,25 @@ int main()
     pressSpaceText.setString("Press space to start");
     pressSpaceText.setPosition(windowWidth / 2 - 165, windowHeight / 2);
 
+    // Powerups
+    sf::Texture powerupTexture;
+    sf::Texture powerupTexture2;
+
+    // Powerup spawn
+    if (!powerupTexture.loadFromFile("./images/coins/coin_01.png"))
+    {
+        // error...
+    }
+    // Load powerup texture2
+
+    if (!powerupTexture2.loadFromFile("./images/coins/coin_04.png"))
+    {
+        // error...
+    }
+    std::map<int, sf::Texture> powerupTextures;
+    powerupTextures[0] = powerupTexture;
+    powerupTextures[1] = powerupTexture2;
+
  
 
 
@@ -262,14 +300,8 @@ int main()
     }
     texture.setSmooth(true);
 
-    // Load powerup texture
-    sf::Texture powerupTexture;
-    if (!powerupTexture.loadFromFile("./images/crystals/crystal-qubodup-ccby3-32-blue.png"))
-    {
-        // error...
-    }
-    Powerup powerup(100, 100, 0, powerupTexture);
-    Powerup powerupDown(200, 200, 1, powerupTexture);
+
+
 
 
     // Load life indicator texture
@@ -321,7 +353,7 @@ int main()
         // New level
         if (bricks.empty()) {
             srand((unsigned)time(NULL));
-            changeMusic(music3, music1, music2);
+            //changeMusic(music3, music1, music2);
 			level++;
             gameStopped = true;
             
@@ -401,12 +433,11 @@ int main()
         testCollision(paddle, ball);
 
         // Test collision for powerup
-        testCollision(powerup, paddle);
-        testCollision(powerupDown, paddle);
+        for (auto& powerup : powerups) testCollision(powerup, paddle);
 
         // We use another C++11 foreach loop to test collisions
         // between the ball and EVERY brick.
-        for (auto& brick : bricks) testCollision(brick, ball);
+        for (auto& brick : bricks) testCollision(brick, ball, powerupTextures);
 
         // And we use the "erase-remove idiom" to remove all `destroyed`
         // blocks from the block vector - using a cool C++11 lambda!
@@ -416,6 +447,14 @@ int main()
                 return mBrick.destroyed;
             }),
             end(bricks));
+
+        // Erase powerups that are out of bounds
+        powerups.erase(std::remove_if(powerups.begin(), powerups.end(), [](const Powerup& p) {
+
+            return p.destroyed;
+            }), powerups.end());
+
+
 
         window.draw(ball.shape);
         window.draw(paddle.shape);
@@ -427,10 +466,22 @@ int main()
             p.update(2);
         }
 
+        //Update powerups
+        for (Powerup& powerup : powerups) {
+			powerup.update();
+		}
+
 		// Draw particles
         for (const Particle& p : particles) {
 			window.draw(p.shape);
 		}
+
+        //Draw powerups
+        for (const Powerup& powerup : powerups) {
+            window.draw(powerup.shape);
+        }
+
+
 
         // Remove particles that are out of bounds
         particles.erase(std::remove_if(particles.begin(), particles.end(), [](const Particle& p) {
@@ -450,12 +501,7 @@ int main()
 			window.draw(lifeIndicator.lifeIndicatorShape);
 		}
 
-
-        powerup.update();
-        window.draw(powerup.sprite);
-        powerupDown.update();
-        window.draw(powerupDown.sprite);
-        
+       
         window.display();
     }
 
