@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Brick.cpp" />
+    <ClCompile Include="Laser.cpp" />
     <ClCompile Include="LifeIndicator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Paddle.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Brick.h" />
     <ClInclude Include="global.h" />
+    <ClInclude Include="Laser.h" />
     <ClInclude Include="LifeIndicator.h" />
     <ClInclude Include="Paddle.h" />
     <ClInclude Include="Powerup.h" />

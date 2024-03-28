@@ -9,6 +9,7 @@
 #include "Powerup.h"
 #include <iostream>
 #include <random>
+#include "Laser.h"
 
 int windowWidth{ 800 }, windowHeight{ 600 };
 
@@ -25,6 +26,8 @@ int particlesSize = 0;
 sf::Text pressSpaceText;
 bool gameStopped = true;
 sf::Clock blinkClock;
+sf::Clock laserClock;
+sf::Text laserText;
 
 int numberOfLives = 3;
 std::vector<LifeIndicator> lifeIndicators;
@@ -44,7 +47,8 @@ sf::Texture particleTexture;
 sf::Texture ballTexture;
 std::vector<Powerup> powerups;
 std::vector<Ball> balls;
-
+bool lasersActivated = true;
+std::vector<Laser> lasers;
 
 
 
@@ -108,6 +112,10 @@ void testCollision(Powerup& mPowerUp, Paddle& mPaddle) {
 		// Add ball
 		Ball ball(windowWidth / 2, windowHeight / 2, ballTexture);
 		balls.push_back(ball);
+    }
+    if (mPowerUp.powerupType == 3) {
+        lasersActivated = true;
+        laserClock.restart();        
     }
 
 }
@@ -186,10 +194,39 @@ void testCollision(Brick& mBrick, Ball& mBall, std::map<int, sf::Texture>& power
     if (powerupChance < 20) {
        
         // Randomly choose powerup type
-        int powerupType = rand() % 3;
+        int powerupType = rand() % 4;
 		powerups.push_back(Powerup(mBrick.x(), mBrick.y(), powerupType, powerupTextures[powerupType]));
 	}
 }
+
+//Test laser and brick collision
+void testCollision(Laser& mLaser, Brick& mBrick) {
+	if (!isIntersecting(mLaser, mBrick)) return;
+    score += 100 * mBrick.hp;
+	mBrick.hp = 0;
+	mBrick.destroyed = true;
+    mLaser.destroyed = true;
+
+    if (!brickHitBuffer.loadFromFile("./sounds/brickHit.ogg"))
+    {
+		// error...
+	}
+	brickHit.setBuffer(brickHitBuffer);
+	brickHit.setVolume(50);
+	brickHit.play();
+	// Create particles
+    if (!particleTexture.loadFromFile("./images/default_particle.png"))
+    {
+		// error...
+	}
+	particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), true, particleTexture, mBrick.hp));
+	particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), false, particleTexture, mBrick.hp));
+	particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), true, particleTexture, mBrick.hp));
+	particles.push_back(Particle::Particle(sf::Vector2f(mBrick.x(), mBrick.y()), false, particleTexture, mBrick.hp));
+	// Used to track how many particles are on the screen to make them fall higher each time for better effect
+	particlesSize = particles.size();
+}
+
 
 void changeMusic(sf::Music& music1, sf::Music& music2, sf::Music& music3) {
     if (music1.getStatus() == sf::Music::Playing) {
@@ -247,12 +284,24 @@ int main()
     pressSpaceText.setString("Press space to start");
     pressSpaceText.setPosition(windowWidth / 2 - 165, windowHeight / 2);
 
+    laserText.setFont(font);
+    laserText.setCharacterSize(14);
+    laserText.setFillColor(sf::Color::Red);
+    laserText.setString("Lasers activated, press UP to shoot");
+    laserText.setPosition(windowWidth - 420, windowHeight - 20);
+
+
+
+
     // Powerups
     sf::Texture powerupTexture;
     sf::Texture powerupTexture2;
     sf::Texture powerupTexture3;
+    sf::Texture powerupTexture4;
     powerupTexture.setSmooth(true);
     powerupTexture2.setSmooth(true);
+    powerupTexture3.setSmooth(true);
+    powerupTexture4.setSmooth(true);
 
     // Powerup spawn
     if (!powerupTexture.loadFromFile("./images/coins/coin_01.png"))
@@ -269,10 +318,16 @@ int main()
     {
         // error...
     }
+    if (!powerupTexture4.loadFromFile("./images/coins/coin_05.png"))
+    {
+        // error...
+    }
+
     std::map<int, sf::Texture> powerupTextures;
     powerupTextures[0] = powerupTexture;
     powerupTextures[1] = powerupTexture2;
     powerupTextures[2] = powerupTexture3;
+    powerupTextures[3] = powerupTexture4;
 
     if (!ballTexture.loadFromFile("./images/ballBlue.png"))
     {
@@ -281,10 +336,23 @@ int main()
 
 
 
+
     Ball ball(windowWidth / 2, windowHeight / 2, ballTexture);
     balls.push_back(ball);
 
     Paddle paddle(windowWidth / 2, windowHeight - 50 );
+	sf::Texture paddleTextureBlue;
+    if (!paddleTextureBlue.loadFromFile("./images/paddleBlue.png"))
+    {
+		// error...
+	}
+    paddleTextureBlue.setSmooth(true);
+    sf::Texture paddleTextureRed;
+    if (!paddleTextureRed.loadFromFile("./images/paddleRed.png"))
+    {
+        // error...
+    }
+    paddleTextureRed.setSmooth(true);
 
     sf::Music music1;
     if (!music1.openFromFile("./sounds/backgroundMusic1.ogg"))
@@ -349,8 +417,35 @@ int main()
 				if (event.key.code == sf::Keyboard::Escape)
 					window.close();
 			}
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Up && lasersActivated) {
+                    lasers.push_back(Laser(paddle.x(), paddle.y()));
+                    // Play laser sound
+                    if (!brickHitBuffer.loadFromFile("./sounds/laser.wav"))
+                    {
+						// error...
+					}
+                    brickHit.setBuffer(brickHitBuffer);
+                    brickHit.setVolume(50);
+                    brickHit.play();
+
+
+                }
+            }
 
 			
+        }
+
+        if (lasersActivated) {
+            //Show text in lower right corner that lasers are activated
+            paddle.shape.setTexture(&paddleTextureRed);
+            if (laserClock.getElapsedTime().asSeconds() > 4) {
+                lasersActivated = false;
+                
+            }
+        }
+        else {
+           paddle.shape.setTexture(&paddleTextureBlue);
         }
 
         window.clear(sf::Color(30, 41, 59));
@@ -376,6 +471,8 @@ int main()
             balls.push_back(Ball(windowWidth / 2, windowHeight / 2, ballTexture));
             paddle.reset();
             powerups.clear();
+            lasers.clear();
+            lasersActivated = false;
 
             changeMusic(music3, music1, music2);
 			level++;
@@ -459,11 +556,23 @@ int main()
             testCollision(paddle, ball);
 		}
 
+        // Update lasers
+        for (Laser& laser : lasers) {
+            laser.update();
+        }
+
 
 
 
         // Test collision for powerup
         for (auto& powerup : powerups) testCollision(powerup, paddle);
+
+        // Tests collision for lasers
+        for (auto& laser : lasers) {
+            for (auto& brick : bricks) {
+				testCollision(laser, brick);
+			}
+		}
 
         // We use another C++11 foreach loop to test collisions
         // between the ball and EVERY brick.
@@ -486,6 +595,11 @@ int main()
 
             return p.destroyed;
             }), powerups.end());
+
+        // Erase lasers that are destroyed
+        lasers.erase(std::remove_if(lasers.begin(), lasers.end(), [](const Laser& l) {
+			return l.destroyed;
+			}), lasers.end());
 
         for (Ball& ball : balls) {
             if (ball.y() > windowHeight) {
@@ -527,6 +641,10 @@ int main()
             window.draw(powerup.shape);
         }
 
+        //Draw lasers
+        for (const Laser& laser : lasers) {
+			window.draw(laser.shape);
+		}
 
 
         // Remove particles that are out of bounds
@@ -547,7 +665,10 @@ int main()
 			window.draw(lifeIndicator.lifeIndicatorShape);
 		}
 
-       
+        if (lasersActivated) {
+            window.draw(laserText);
+        }
+
         window.display();
     }
 
