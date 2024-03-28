@@ -521,6 +521,7 @@ int main()
         if (balls.empty()) {
 			balls.push_back(Ball(windowWidth / 2, windowHeight / 2, ballTexture));
             powerups.clear();
+            lasersActivated = false;
 			paddle.reset();
 			numberOfLives--;
 			lifeIndicators.pop_back();
