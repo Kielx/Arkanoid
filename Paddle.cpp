@@ -41,5 +41,6 @@ void Paddle::update()
 void Paddle::reset()
 {
 	shape.setPosition(windowWidth / 2, windowHeight - 50);
+	shape.setSize({ paddleWidth, paddleHeight });
 	velocity.x = 0;
 }

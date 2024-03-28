@@ -3,13 +3,10 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
-Ball::Ball(float startX, float startY)
+Ball::Ball(float startX, float startY, sf::Texture &texture)
 {
 
-	if (!texture.loadFromFile("./images/ballBlue.png")) 
-	{
-		// error...
-	}
+
 	texture.setSmooth(true);
     shape.setRadius(10.f);
     shape.setOrigin(shape.getRadius(), shape.getRadius());

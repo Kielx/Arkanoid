@@ -8,8 +8,10 @@
 #include "Particle.cpp"
 #include "Powerup.h"
 #include <iostream>
+#include <random>
 
 int windowWidth{ 800 }, windowHeight{ 600 };
+
 
 sf::SoundBuffer paddleHitBuffer;
 sf::Sound paddleHit;
@@ -27,6 +29,8 @@ sf::Clock blinkClock;
 int numberOfLives = 3;
 std::vector<LifeIndicator> lifeIndicators;
 
+std::mt19937 mt(std::random_device{}());
+
 
 
 
@@ -37,7 +41,9 @@ std::vector<LifeIndicator> lifeIndicators;
 // Bricks broken particle vector
 std::vector<Particle> particles;
 sf::Texture particleTexture;
+sf::Texture ballTexture;
 std::vector<Powerup> powerups;
+std::vector<Ball> balls;
 
 
 
@@ -54,11 +60,8 @@ bool isIntersecting(T1& mA, T2& mB)
 // Let's define a function that deals with paddle/ball collision.
 void testCollision(Paddle& mPaddle, Ball& mBall)
 {
-    srand((unsigned)time(NULL));
     // If there's no intersection, get out of the function.
     if (!isIntersecting(mPaddle, mBall)) return;
-
-
 
     // Otherwise let's "push" the ball upwards.
     mBall.velocity.y = -mBall.ballVelocity;
@@ -101,6 +104,11 @@ void testCollision(Powerup& mPowerUp, Paddle& mPaddle) {
 		mPaddle.shape.setSize({ mPaddle.paddleWidth / 1.5f, mPaddle.paddleHeight });
 		mPaddle.shape.setOrigin(mPaddle.paddleWidth / 1.5f / 2.f, mPaddle.paddleHeight / 2.f);
 	}
+    if (mPowerUp.powerupType == 2) {
+		// Add ball
+		Ball ball(windowWidth / 2, windowHeight / 2, ballTexture);
+		balls.push_back(ball);
+    }
 
 }
 
@@ -173,13 +181,12 @@ void testCollision(Brick& mBrick, Ball& mBall, std::map<int, sf::Texture>& power
     brickHit.setVolume(50);
     brickHit.play();
 
-    
-    if (rand() % 100 < 10) {
-        // Load powerup texture1
-
-        
+    int powerupChance = mt() % 100; 
+    std::cout << powerupChance << std::endl;
+    if (powerupChance < 20) {
+       
         // Randomly choose powerup type
-        int powerupType = rand() % 2;
+        int powerupType = rand() % 3;
 		powerups.push_back(Powerup(mBrick.x(), mBrick.y(), powerupType, powerupTextures[powerupType]));
 	}
 }
@@ -205,7 +212,7 @@ void changeMusic(sf::Music& music1, sf::Music& music2, sf::Music& music3) {
 
 int main()
 {
-
+    srand((unsigned)time(NULL));
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
 
@@ -243,6 +250,9 @@ int main()
     // Powerups
     sf::Texture powerupTexture;
     sf::Texture powerupTexture2;
+    sf::Texture powerupTexture3;
+    powerupTexture.setSmooth(true);
+    powerupTexture2.setSmooth(true);
 
     // Powerup spawn
     if (!powerupTexture.loadFromFile("./images/coins/coin_01.png"))
@@ -255,15 +265,25 @@ int main()
     {
         // error...
     }
+    if (!powerupTexture3.loadFromFile("./images/coins/coin_03.png"))
+    {
+        // error...
+    }
     std::map<int, sf::Texture> powerupTextures;
     powerupTextures[0] = powerupTexture;
     powerupTextures[1] = powerupTexture2;
+    powerupTextures[2] = powerupTexture3;
 
- 
+    if (!ballTexture.loadFromFile("./images/ballBlue.png"))
+    {
+        // error...
+    }
 
 
 
-    Ball ball(windowWidth / 2, windowHeight / 2);
+    Ball ball(windowWidth / 2, windowHeight / 2, ballTexture);
+    balls.push_back(ball);
+
     Paddle paddle(windowWidth / 2, windowHeight - 50 );
 
     sf::Music music1;
@@ -352,8 +372,12 @@ int main()
 
         // New level
         if (bricks.empty()) {
-            srand((unsigned)time(NULL));
-            //changeMusic(music3, music1, music2);
+            balls.clear();
+            balls.push_back(Ball(windowWidth / 2, windowHeight / 2, ballTexture));
+            paddle.reset();
+            powerups.clear();
+
+            changeMusic(music3, music1, music2);
 			level++;
             gameStopped = true;
             
@@ -390,16 +414,16 @@ int main()
 
      }
 
-        // Update ball
-        ball.update();
+
 
         // Update paddle
         paddle.update();
 
         // Test if ball has gone out of bounds
 
-        if (ball.y() > windowHeight) {
-			ball.reset();
+        if (balls.empty()) {
+			balls.push_back(Ball(windowWidth / 2, windowHeight / 2, ballTexture));
+            powerups.clear();
 			paddle.reset();
 			numberOfLives--;
 			lifeIndicators.pop_back();
@@ -428,16 +452,25 @@ int main()
 
 
 
+        // Update ball
+        for (Ball& ball : balls) {
+			ball.update();
+            // Let's test the collision every game loop iteration.
+            testCollision(paddle, ball);
+		}
 
-        // Let's test the collision every game loop iteration.
-        testCollision(paddle, ball);
+
+
 
         // Test collision for powerup
         for (auto& powerup : powerups) testCollision(powerup, paddle);
 
         // We use another C++11 foreach loop to test collisions
         // between the ball and EVERY brick.
-        for (auto& brick : bricks) testCollision(brick, ball, powerupTextures);
+        for (auto& brick : bricks) {
+            for (auto& ball : balls)
+            testCollision(brick, ball, powerupTextures);
+        }
 
         // And we use the "erase-remove idiom" to remove all `destroyed`
         // blocks from the block vector - using a cool C++11 lambda!
@@ -454,10 +487,23 @@ int main()
             return p.destroyed;
             }), powerups.end());
 
+        for (Ball& ball : balls) {
+            if (ball.y() > windowHeight) {
+                ball.destroyed = true;
+                balls.erase(std::remove_if(balls.begin(), balls.end(), [](const Ball& b) {
+					return b.destroyed;
+					}), balls.end());
+            }
+        }            
 
 
-        window.draw(ball.shape);
+
+        
         window.draw(paddle.shape);
+
+        for (Ball& ball : balls) {
+            window.draw(ball.shape);
+        }
 
         for (auto& brick : bricks) window.draw(brick.shape);
 

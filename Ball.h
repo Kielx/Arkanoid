@@ -12,15 +12,15 @@ class Ball
     sf::SoundBuffer brickHitBuffer;
     sf::Sound brickHit;
 
-
-
 	// Let's create some constants for the Ball class.
-	const float ballRadius{ 10.f }, ballVelocity{ 6.f };
+    float ballRadius{ 10.f }, ballVelocity{ 6.f };
+
+    bool destroyed { false };
 
 	// 2D vector that stores the Ball's velocity.
 	sf::Vector2f velocity{ -ballVelocity, -ballVelocity };
 
-    Ball(float startX, float startY);
+    Ball(float startX, float startY, sf::Texture& texture);
     ~Ball();
 
     void update();
