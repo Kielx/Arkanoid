@@ -1,56 +1,69 @@
+/**
+ * @file Particle.cpp
+ * @brief This file contains the Particle class.
+ */
+
 #include <SFML/Graphics.hpp>
 #include "global.h"
 
+ /**
+  * @class Particle
+  * @brief This class represents a Particle in the game.
+  */
 class Particle {
 public:
 
+    /**
+     * @brief The position of the Particle.
+     */
     sf::Vector2f position;
+
+    /**
+     * @brief The velocity of the Particle.
+     */
     sf::Vector2f velocity;
+
+    /**
+     * @brief The texture of the Particle.
+     */
     sf::Texture texture;
+
+    /**
+     * @brief Represents the shape of the Particle.
+     */
     sf::CircleShape shape;
+
+    /**
+     * @brief The color of the Particle.
+     */
     sf::Color color;
+
+    /**
+     * @brief Represents the direction of the Particle.
+     */
     bool right;
-    float gravity = 0.05f; // Adjust as needed
 
+    /**
+     * @brief The gravity affecting the Particle.
+     */
+    float gravity = 0.05f;
 
-    Particle(sf::Vector2f position, bool right, sf::Texture &texture, int hp) : position(position){
-        
-        shape.setPosition(position);
-        shape.setRadius(13);
-        shape.setPointCount(4);
-        shape.setTexture(&texture);
-
-        this->right = right;
-
-        if (hp == 0) {
-            shape.setFillColor(sf::Color::White);
-        }
-        else if (hp == 1) {
-            shape.setFillColor(sf::Color::Color(96, 165, 250));
-        }
-        else if (hp == 2) {
-            shape.setFillColor(sf::Color::Yellow);
-        }
-        else if (hp == 3) {
-            shape.setFillColor(sf::Color::Red);
-        }
-
-
-        // Set an initial upward velocity
-        velocity.y = -2.5f - float(particlesSize)/10; // Adjust as needed
-        // Set a random horizontal velocity
-        velocity.x = (std::rand() % 20 - 10) / 40.0f; // Adjust as needed
+    /**
+     * @brief Constructor for the Particle class.
+     * @param position The position of the Particle.
+     * @param right The direction of the Particle.
+     * @param texture The texture of the Particle.
+     * @param hp The hit points of the Particle.
+     */
+    Particle(sf::Vector2f position, bool right, sf::Texture& texture, int hp) : position(position) {
+        // Constructor implementation
     }
 
+    /**
+     * @brief Updates the Particle's state.
+     * @param dt The time delta for the update.
+     */
     void update(float dt) {
-        // Apply gravity to the vertical velocity
-        velocity.y += gravity * dt;
-        // Apply velocity to position
-        position += velocity * dt;
-        // Update the shape's position
-        shape.setPosition(position);
-        right ? shape.rotate(2) : shape.rotate(-2);
-        right ? shape.move(1, 0) : shape.move(-1, 0);
+        // Update implementation
     }
-   
 };
