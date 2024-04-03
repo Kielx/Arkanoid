@@ -11,9 +11,8 @@
 #include <random>
 #include "Laser.h"
 
+
 int windowWidth{ 800 }, windowHeight{ 600 };
-
-
 sf::SoundBuffer paddleHitBuffer;
 sf::Sound paddleHit;
 sf::SoundBuffer brickHitBuffer;
@@ -28,20 +27,9 @@ bool gameStopped = true;
 sf::Clock blinkClock;
 sf::Clock laserClock;
 sf::Text laserText;
-
 int numberOfLives = 3;
 std::vector<LifeIndicator> lifeIndicators;
-
 std::mt19937 mt(std::random_device{}());
-
-
-
-
-
-
-
-
-// Bricks broken particle vector
 std::vector<Particle> particles;
 sf::Texture particleTexture;
 sf::Texture ballTexture;
@@ -49,6 +37,14 @@ std::vector<Powerup> powerups;
 std::vector<Ball> balls;
 bool lasersActivated = true;
 std::vector<Laser> lasers;
+
+
+
+
+
+
+
+
 
 
 
