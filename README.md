@@ -2,6 +2,8 @@
 
 **Super Arkanoid** is a modern C++ implementation of the classic brick-breaking game, built using **SFML**. Break bricks, catch power-ups, and enjoy 8-bit nostalgia!
 
+![Mobile View](images/readme2.gif)
+
 ## 🚀 Features
 
 - 🧱 **Classic Arkanoid Gameplay**: Destroy bricks by bouncing the ball off your paddle. Keep the ball from slipping past your paddle, or you'll lose a life!
